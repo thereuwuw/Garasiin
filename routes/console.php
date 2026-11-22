@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Services\GarageService;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Garasi yang sewanya sudah selesai kembali menjadi available setiap hari.
+Schedule::call(fn () => GarageService::syncStatuses())->dailyAt('00:05');

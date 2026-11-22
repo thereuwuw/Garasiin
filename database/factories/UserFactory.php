@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -25,21 +27,33 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'nik' => fake()->unique()->numerify('################'), // 16 digit
             'name' => fake()->name(),
+            'phone' => fake()->numerify('08##########'),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => UserRole::Penyewa,
+            'status' => UserStatus::Accepted,
             'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
+    public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+        return $this->state(fn () => [
+            'nik' => null,
+            'phone' => null,
+            'role' => UserRole::Admin,
         ]);
+    }
+
+    public function pending(): static
+    {
+        return $this->state(fn () => ['status' => UserStatus::Pending]);
+    }
+
+    public function rejected(): static
+    {
+        return $this->state(fn () => ['status' => UserStatus::Rejected]);
     }
 }
